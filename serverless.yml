@@ -1,0 +1,40 @@
+service: code-to-screenshot
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: eu-west-1
+  environment:
+    DEBUG: '*'
+    PAGE_LOAD_TIMEOUT: '20000'
+    LOGGING: 'true'
+
+plugins:
+  - serverless-plugin-chrome
+  - serverless-webpack
+
+custom:
+  chrome:
+    flags:
+      - --hide-scrollbars
+
+functions:
+  code-to-screenshot:
+    memorySize: 1536
+    timeout: 30
+    handler: src/handlers/screenshot.default
+    events:
+      - http:
+          path: code-to-screenshot
+          method: post
+
+resources:
+  Resources:
+    ApiGatewayRestApi:
+      Properties:
+        BinaryMediaTypes:
+          - "*/*"
